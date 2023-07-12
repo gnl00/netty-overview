@@ -8,7 +8,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 public class ProxyClientChannelHandler extends ChannelInboundHandlerAdapter {
 
-    private Channel proxyServerInBoundChannel;
+    private final Channel proxyServerInBoundChannel;
 
     public ProxyClientChannelHandler(Channel inBoundChannel) {
         this.proxyServerInBoundChannel = inBoundChannel;
