@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.demo</groupId>
-    <artifactId>netty-overwiew</artifactId>
+    <artifactId>netty-overview</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

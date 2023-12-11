@@ -6,7 +6,7 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 
 /**
- * TODO
+ * HBServerChannelHandler
  *
  * @author gnl
  * @since 2023/5/23

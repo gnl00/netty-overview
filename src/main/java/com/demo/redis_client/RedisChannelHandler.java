@@ -1,4 +1,4 @@
-package com.demo.greenis;
+package com.demo.redis_client;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -12,7 +12,7 @@ import io.netty.util.ReferenceCountUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GreenisChannelHandler extends ChannelDuplexHandler {
+public class RedisChannelHandler extends ChannelDuplexHandler {
 
     // 发送 redis 命令
     @Override
@@ -31,6 +31,7 @@ public class GreenisChannelHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RedisMessage message = (RedisMessage) msg;
+
         printResponse(message);
         System.out.print(">");
         ReferenceCountUtil.release(message);

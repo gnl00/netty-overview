@@ -10,7 +10,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 
 /**
- * TODO
+ * SSLChannelInitializer
  *
  * @author gnl
  * @since 2023/5/26
