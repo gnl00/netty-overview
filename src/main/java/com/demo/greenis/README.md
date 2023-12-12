@@ -180,7 +180,7 @@ OK
 ## 扩展
 
 1、可以参考 `redis.clients.jedis.Jedis#set` 和 `redis.clients.jedis.Connection#executeCommand` 看第三方库如何完善 RESP 协议的实现。
-2、
+2、io.lettuce.core.RedisClient#create
 
 ---
 
