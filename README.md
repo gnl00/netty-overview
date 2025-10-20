@@ -5,8 +5,6 @@
 
 > 关于 IO 模型的演变以及多路复用可以看看[这篇文章](https://mp.weixin.qq.com/s/zAh1yD5IfwuoYdrZ1tGf5Q)，很详细。
 
-
-
 > **关键词**
 >
 > * DMA：直接内存访问 *Direct Memory Access*
@@ -731,9 +729,75 @@ public class CombinedByteCharCodec extends CombinedChannelDuplexHandler<ByteToCh
 
 <br>
 
-## TCP 粘包和拆包
+## TCP“粘包”和“拆包”
 
 > [TCP 粘包和拆包及解决方案](https://dongzl.github.io/netty-handbook/#/_content/chapter09?id=第-9-章-tcp-粘包和拆包及解决方案)
+
+常见的几种解决方案：
+- LineBasedFrameDecoder
+- DelimiterBasedFrameDecoder
+- 自定义消息，加上消息 length，自定义 Encoder 和 Decoder
+
+**“粘包”和“拆包”确实是中文技术社区广泛使用但英文技术文献中几乎不存在的术语**。它们是对 TCP 字节流特性的**形象化中文描述**，而非标准网络协议术语。
+
+---
+
+### 一、英文中是否存在 “Sticky Packet” 或 “Packet Splitting”？
+
+在主流英文网络编程、操作系统或 RFC 文档中：
+
+- **没有 “sticky packet”、“packet sticking” 或 “packet splitting” 这样的标准术语**。
+- 相关问题通常被描述为：
+    - **Message Framing Problem**（消息定界问题）
+    - **TCP is a byte-stream protocol, not message-oriented**（TCP 是字节流协议，非消息导向）
+    - **Application-level protocol needs delimiters or length fields**（应用层协议需自行处理消息边界）
+
+例如，英文社区会说：
+> “TCP does not preserve message boundaries; you must implement framing in your application protocol.”  
+（TCP 不保留消息边界；你必须在应用层协议中实现定界。）
+
+而不会说 “TCP has a sticky packet problem”。
+
+---
+
+### 二、为什么中文社区有“粘包/拆包”？
+
+1. **形象化教学需要**  
+   中文技术文章为了便于初学者理解 TCP 的“无消息边界”特性，创造了“粘包”（多个应用消息被合并成一个 TCP 段或接收缓冲区读取时连在一起）和“拆包”（一个应用消息被分成多个 TCP 段传输）的说法 。
+
+2. **历史传播与面试文化**  
+   这一术语在中文互联网（尤其是 Java/Netty 面试八股文）中被广泛传播，甚至被误认为是 TCP 协议的“缺陷” 。但实际上，**这是应用层设计问题，不是 TCP 的 bug** 。
+
+3. **术语溯源**  
+   有分析指出，“粘包”“拆包”是中文社区自创术语，在英文 RFC、Linux/Windows 网络编程手册、权威教材（如《UNIX Network Programming》）中均无对应词汇 。
+
+---
+
+### 三、权威佐证
+
+- **《UNIX Network Programming》（W. Richard Stevens）**：全书从未使用 “sticky packet”，而是强调 “TCP is a stream of bytes” 和 “application must define message boundaries”。
+- **RFC 793（TCP 标准）**：只提 “segment”（段），不提 “packet” 作为应用消息单位，更无 “sticking” 概念。
+- 中文技术博客也承认：“‘TCP 粘包’术语传播溯源？……国外使用的术语是 message framing，而非 sticky packet” 。
+
+---
+
+### 四、Netty 文档中的表述
+
+Netty 官方文档（英文版）在处理此类问题时，使用的是：
+- *"Decoders for message framing"*
+- *"Handling partial reads"*
+- *"LengthFieldBasedFrameDecoder"*
+
+而 **从不使用 “sticky packet”**。中文 Netty 教程中的“粘包/拆包”是对这些机制的本地化解释。
+
+---
+
+### 结论
+
+**更准确的英文表达是**：
+- *Message Framing Problem*
+- *Lack of Message Boundaries in TCP*
+- *Need for Application-Level Protocol Delimiting*
 
 …
 
