@@ -2,7 +2,6 @@
 
 > 基于 Java NIO 封装的网络框架
 
-
 > 关于 IO 模型的演变以及多路复用可以看看[这篇文章](https://mp.weixin.qq.com/s/zAh1yD5IfwuoYdrZ1tGf5Q)，很详细。
 
 > **关键词**
@@ -24,12 +23,28 @@
 > * …从上面可以看到，异步 IO 比较依赖于底层内核的支持
 >
 > * C10K 问题：C10K 表示处理 10000 个并发连接。
+    >
+    >   注意这里的并发连接和每秒请求数不同，虽然它们是相似的：每秒处理许多请求需要很高的吞吐量（快速处理它们），但是更大的数量并发连接需要高效的连接调度。
 >
->   注意这里的并发连接和每秒请求数不同，虽然它们是相似的：每秒处理许多请求需要很高的吞吐量（快速处理它们），但是更大的数量并发连接需要高效的连接调度。
+> * socket
+    >
+    >   socket ≈ 一个带状态的“网络连接对象”
+    >
+    >   里面包含：
+    >
+    >   ```
+>   - 对端 IP/端口
+>   - 本地 IP/端口
+>   - TCP 状态（ESTABLISHED / TIME_WAIT）
+>   - 发送队列（send buffer）
+>   - 接收队列（recv buffer）
+>   - 拥塞控制信息
+>   - 重传队列
+>   ```
+    >
+    >   socket 缓冲区是 **内核为这个 socket 对象分配的一块内存**。
 >
 > * …
-
-> 
 
 <br>
 
@@ -371,7 +386,7 @@ Buffer 引用计数器，ByteBuf 和 ByteBufHolder 均继承自 ReferenceCounted
 
 #### Bootstrap
 
-负责启动 Netty 客户端。使用 connect() 方法进行 TCP 传输，bind() 方法进行 UDP 传输。connect 和 bind 方法返回一个 ChannelFuture 表示异步 Channel I/O 操作的结果。
+负责启动 Netty 客户端。使用 connect() 方法和服务端建立连接。connect 方法返回一个 ChannelFuture 表示异步 Channel I/O 操作的结果。
 
 …
 
@@ -381,7 +396,16 @@ Buffer 引用计数器，ByteBuf 和 ByteBufHolder 均继承自 ReferenceCounted
 
 ### Channel
 
-连接到网络套接字（Socket）或能够执行 I/O 操作（例如读取、写入、连接和绑定）的组件。可以对 Channel 进行以下操作：
+连接到网络套接字（Socket）或能够执行 I/O 操作（例如读取、写入、连接和绑定）的组件。
+
+```java
+// TCP
+NioSocketChannel
+// UDP
+NioDatagramChannel
+```
+
+可以对 Channel 进行以下操作：
 
 1、查看当前 Channel 的状态
 
@@ -729,7 +753,7 @@ public class CombinedByteCharCodec extends CombinedChannelDuplexHandler<ByteToCh
 
 <br>
 
-## TCP“粘包”和“拆包”
+## TCP 粘包和拆包
 
 > [TCP 粘包和拆包及解决方案](https://dongzl.github.io/netty-handbook/#/_content/chapter09?id=第-9-章-tcp-粘包和拆包及解决方案)
 
@@ -1310,6 +1334,14 @@ private boolean initChannel(ChannelHandlerContext ctx) throws Exception {
 
 …
 
+
+
+### HashedWheelTimer 时间轮
+
+[时间轮原理以及 Netty 实现](https://learn.lianglianglee.com/%E4%B8%93%E6%A0%8F/Netty%20%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E5%89%96%E6%9E%90%E4%B8%8E%20RPC%20%E5%AE%9E%E8%B7%B5-%E5%AE%8C/21%20%20%E6%8A%80%E5%B7%A7%E7%AF%87%EF%BC%9A%E5%BB%B6%E8%BF%9F%E4%BB%BB%E5%8A%A1%E5%A4%84%E7%90%86%E7%A5%9E%E5%99%A8%E4%B9%8B%E6%97%B6%E9%97%B4%E8%BD%AE%20HashedWheelTimer.md)
+
+…
+
 ---
 
 <br>
@@ -1361,7 +1393,7 @@ public class GreenisChannelHandler extends ChannelDuplexHandler {
         ctx.write(requestMessages, promise);
     }
 
-  	// 接收 redis 响应
+    // 接收 redis 响应
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RedisMessage message = (RedisMessage) msg;
